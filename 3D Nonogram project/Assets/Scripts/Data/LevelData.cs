@@ -15,5 +15,5 @@ public class LevelData
 
     [Header("Level Creation Data")]
     public VoxelData[] VoxelData { get; private set; }
-    public Vector3Int GridSize;
+    public GridData GridData {get; private set;}
 }

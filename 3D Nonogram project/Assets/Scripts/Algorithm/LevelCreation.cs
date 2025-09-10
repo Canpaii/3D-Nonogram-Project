@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class LevelCreation : MonoBehaviour
 {
-    // This script is for instancing the puzzle when a level gets selected, not for UGC
+    // This script is for instancing the puzzle when a level gets selected, not for making the level itself
     public LevelData LevelData { get; private set; }
     [SerializeField] private GameObject voxelPrefab;
 
@@ -18,6 +18,13 @@ public class LevelCreation : MonoBehaviour
             GameObject voxelInstance = Instantiate(voxelPrefab, voxel.GridPosition, Quaternion.identity);
 
             voxelInstance.GetComponent<Voxel>().Initialize(voxel.VoxelColor);
+            voxelInstance.GetComponent<Voxel>().SetVoxelType(true);
+        }
+        
+        foreach (Vector3Int emptyPos in LevelData.GridData.emptySpaces)
+        {
+            GameObject voxelInstance = Instantiate(voxelPrefab, emptyPos, Quaternion.identity);
+            voxelInstance.GetComponent<Voxel>().SetVoxelType(false);
         }
     }
 }
