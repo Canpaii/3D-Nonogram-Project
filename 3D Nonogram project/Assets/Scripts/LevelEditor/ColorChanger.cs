@@ -5,16 +5,20 @@ public class ColorChanger : MonoBehaviour
 {
     [SerializeField] private LevelEditor _levelEditor;
 
-    public Color[] colors;
-    public GameObject buttonPrefab;
-    public Transform buttonParent;
-    public Image currentColorDisplay;
+    [SerializeField] private Color[] _colors;
+    [SerializeField] private GameObject _buttonPrefab;
+    [SerializeField] private Transform _buttonParent;
+    [SerializeField] private Image _currentColorDisplay;
 
+    private void Start()
+    {
+        GenerateButtons();
+    }
     public void GenerateButtons()
     {
-        foreach (Color c in colors)
+        foreach (Color c in _colors)
         {
-            GameObject btnObj = Instantiate(buttonPrefab, buttonParent);
+            GameObject btnObj = Instantiate(_buttonPrefab, _buttonParent);
             var btnImage = btnObj.GetComponent<Image>();
             btnImage.color = c;
 
