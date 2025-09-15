@@ -30,7 +30,6 @@ public class VoxelInteraction : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hitInfo))
         {
-            print(hitInfo);
             hitInfo.collider.gameObject.GetComponent<Voxel>().HandleClick(interactionType);
         }
     }

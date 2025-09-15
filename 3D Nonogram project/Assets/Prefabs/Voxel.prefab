@@ -648,7 +648,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 113d64d184c961f43970cb535fa94e11, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -709,6 +709,9 @@ MonoBehaviour:
   minXAxis: {fileID: 7231607977517766572}
   minYAxis: {fileID: 4502878786157372523}
   minZAxis: {fileID: 3235698309052477764}
+  baseMaterial: {fileID: 0}
+  markedMaterial: {fileID: 0}
+  colloredMaterial: {fileID: 0}
 --- !u!1 &3683432844299436590
 GameObject:
   m_ObjectHideFlags: 0

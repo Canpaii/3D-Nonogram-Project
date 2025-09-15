@@ -1,119 +1,138 @@
-using System.Collections;
 using UnityEngine;
-using static UnityEngine.UI.Image;
-
 
 public class LevelEditor : MonoBehaviour
 {
-    // private Stack _previousMoves = new Stack();
-    private EditMode _editMode;
     [SerializeField] private Color _color;
-    [SerializeField] private GameObject transparentVoxel;
+    [SerializeField] private GameObject _voxel;
+    [SerializeField] private GameObject _transparentVoxel;
     [SerializeField] private Transform voxelParent;
+    [SerializeField] private LayerMask voxelLayer; // assign layer(s) that contain voxels
+    [SerializeField] private float maxDistance = 50f;
+    [SerializeField] private int maxHitsBuffer = 2;
 
-    private RaycastHit hit;
+    public Vector3Int GridSize { get; private set; }
+
+    private Camera _mainCam;
+    private RaycastHit[] _hitBuffer;
+    private Vector3Int _lastGridPos;
+    private Vector3 _lastMousePos = Vector3.negativeInfinity;
+    private Transform _transparentT;
+    private RaycastHit _currentHit;
     public bool hasHit;
-    public void SetEditMode(EditMode editMode)
-    {
-        _editMode = editMode;
-    }
+    private EditMode _editMode;
 
-    public void SetColor(Color color)
+    private void Awake()
     {
-        _color = color;
+        _mainCam = Camera.main; // cache once
+        _hitBuffer = new RaycastHit[maxHitsBuffer];
+        if (_transparentVoxel) _transparentT = _transparentVoxel.transform;
     }
 
     private void Update()
     {
-        ShootRayCast();
+        // Only raycast if the mouse moved (reduces work massively)
+        if (Input.mousePosition != _lastMousePos)
+        {
+            _lastMousePos = Input.mousePosition;
+            ShootRayCast();
+        }
 
         if (!hasHit) return;
 
-        Vector3 hitPos = hit.point;
-        Vector3Int gridPos = GetGridPosition(hitPos);
+        Vector3 hitPos = _currentHit.point;
+        
+        Vector3Int gridPos = GetGridPosition(hitPos, _currentHit.normal);
+        if (gridPos != _lastGridPos)
+        {
+            HandleHover(gridPos);
+            _lastGridPos = gridPos;
+        }
 
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetMouseButtonDown(0) && !IsInsideGrid(gridPos))
         {
             HandleClick(gridPos);
         }
-        else
-        {
-             HandleHover(gridPos);
-        }
     }
 
-    // I need to find the inside of the box, so I shoot a raycastall and get the 2 hitpoint.
-    // That way you are always inside the box, and if you happen to hit another voxel that also counts as the second hitpoint so everything should work correctly
+    // This function I still dont fully understand but it works for now
     private void ShootRayCast()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit[] hits = Physics.RaycastAll(ray,1000f);
-        Debug.Log(hits);
-        // Sort by distance just to be safe
-        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+        Ray ray = _mainCam.ScreenPointToRay(_lastMousePos);
 
-        if (hits.Length > 1)
-        {
-            // hits[0] is the entry point
-            // hits[1] is the exit point (other side of collider)
-            Debug.Log("Exit point: " + hits[1].point);
+        // Use RaycastNonAlloc to avoid allocations.
+        int hits = Physics.RaycastNonAlloc(ray, _hitBuffer, maxDistance, voxelLayer, QueryTriggerInteraction.Ignore);
 
-            hit = hits[1];
-            hasHit = true;  
-        }
-        else
+        if (hits >= 2)
         {
-            hasHit = false;
+            // find the two nearest hits 
+            int first = -1, second = -1;
+            for (int i = 0; i < hits; i++)
+            {
+                float d = _hitBuffer[i].distance;
+                if (first < 0 || d < _hitBuffer[first].distance)
+                {
+                    second = first;
+                    first = i;
+                }
+                else if (second < 0 || d < _hitBuffer[second].distance)
+                {
+                    second = i;
+                }
+            }
+
+            // entry is first, exit is second 
+            if (first >= 0 && second >= 0)
+            {
+                _currentHit = _hitBuffer[second];
+                Debug.Log(_currentHit);
+                hasHit = true;
+                return;
+            }
         }
-        
+
+        hasHit = false;
     }
 
     private void HandleClick(Vector3Int gridPos)
     {
         switch (_editMode)
         {
-            case EditMode.Place: 
-                GameObject voxelInstance = Instantiate(transparentVoxel, gridPos, Quaternion.identity);
+            case EditMode.Place:
+                GameObject voxelInstance = Instantiate(_voxel, gridPos, Quaternion.identity);
                 voxelInstance.transform.SetParent(voxelParent, true);
+
+                // Add to a list or array 
                 break;
             case EditMode.Erase:
-
                 break;
             case EditMode.Paint:
-
-                break;  
+                break;
         }
     }
 
-    private void HandleHover(Vector3Int hit)
+    private void HandleHover(Vector3Int gridPos)
     {
-        Vector3 hitPoint = hit;
-        
-        Vector3 gridPosition = GetGridPosition(hitPoint);
-
-        // Instantiate a preview voxel 
-        // I shouldn't instantiate that but rather enable and disable it otherwise it will be bad for performance
-       // GameObject previewVoxel = Instantiate(transparentVoxel, gridPosition, Quaternion.identity);
-    }
-    private Vector3Int GetGridPosition(Vector3 hitPoint)
-    {
-        Vector3Int v3Int = Vector3Int.RoundToInt(hitPoint);
-
-        return v3Int;
+        if (_transparentT != null)
+            _transparentT.position = gridPos;
     }
 
-    private void PlaceVoxel()
+    // This doesn't work yet
+    private bool IsInsideGrid(Vector3Int gridPos)
     {
+        Vector3Int halfSize = GridSize / 2; 
 
+        return gridPos.x >= -halfSize.x && gridPos.x <= halfSize.x &&
+               gridPos.y >= -halfSize.y && gridPos.y <= halfSize.y &&
+               gridPos.z >= -halfSize.z && gridPos.z <= halfSize.z;
+    }
+    private Vector3Int GetGridPosition(Vector3 hitPoint, Vector3 normal)
+    {
+        // Move to the voxel space by rounding, then offset in the hit normal direction
+        return Vector3Int.RoundToInt(hitPoint + normal * 0.5f);
     }
 
-    private void EraseVoxel()
-    {
 
-    }
-
-    private void PaintVoxel()
-    {
-
-    }
+    public void SetEditMode(EditMode editMode) => _editMode = editMode;
+    public void SetColor(Color color) => _color = color;
+    public void SetGridSize(Vector3Int v3Int) => GridSize = v3Int;  
 }
