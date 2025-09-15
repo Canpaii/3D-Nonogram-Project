@@ -20,7 +20,7 @@ public enum Axis
 public class Voxel : MonoBehaviour
 {
     // All sides of the voxels
-    // these text components are what hold numbers on the voxel
+    // these text components are what hold clues(number) on the voxel
 
     [Header("Worldspace tekst")]
     public TMP_Text xAxis, yAxis, zAxis;

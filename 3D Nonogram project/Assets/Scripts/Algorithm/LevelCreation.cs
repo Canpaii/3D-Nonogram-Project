@@ -13,13 +13,13 @@ public class LevelCreation : MonoBehaviour
 
     public void GenerateLevel()
     {
-        foreach (VoxelData voxel in LevelData.VoxelData)
+       /* foreach (VoxelData voxel in LevelData.GridData.voxelsInGrid)
         {
             GameObject voxelInstance = Instantiate(voxelPrefab, voxel.GridPosition, Quaternion.identity);
 
             voxelInstance.GetComponent<Voxel>().Initialize(voxel.VoxelColor);
             voxelInstance.GetComponent<Voxel>().SetVoxelType(true);
-        }
+        }*/
         
         foreach (Vector3Int emptyPos in LevelData.GridData.emptySpaces)
         {

@@ -12,33 +12,33 @@ public class NonogramClueGenerator : MonoBehaviour
         var clues = new Dictionary<string, List<int>>();
 
         // ----- X-axis lines: for each (y,z), scan x = 0..GridSize.x-1 -----
-        for (int y = 0; y < gridData.GridSize.y; y++)
+        for (int y = 0; y < gridData.gridSize.y; y++)
         {
-            for (int z = 0; z < gridData.GridSize.z; z++)
+            for (int z = 0; z < gridData.gridSize.z; z++)
             {
                 // getPos maps index i → (x=i, y, z) for this line
-                List<int> lineClues = CountLine((x) => new Vector3Int(x, y, z), gridData.GridSize.x);
+                List<int> lineClues = CountLine((x) => new Vector3Int(x, y, z), gridData.gridSize.x);
                 // store under a readable key; you can swap to a struct later if you like
                 clues[$"X_{y}_{z}"] = lineClues;
             }
         }
 
         // ----- Y-axis lines: for each (x,z), scan y = 0..GridSize.y-1 -----
-        for (int x = 0; x < gridData.GridSize.x; x++)
+        for (int x = 0; x < gridData.gridSize.x; x++)
         {
-            for (int z = 0; z < gridData.GridSize.z; z++)
+            for (int z = 0; z < gridData.gridSize.z; z++)
             {
-                List<int> lineClues = CountLine((y) => new Vector3Int(x, y, z), gridData.GridSize.y);
+                List<int> lineClues = CountLine((y) => new Vector3Int(x, y, z), gridData.gridSize.y);
                 clues[$"Y_{x}_{z}"] = lineClues;
             }
         }
 
         // ----- Z-axis lines: for each (x,y), scan z = 0..GridSize.z-1 -----
-        for (int x = 0; x < gridData.GridSize.x; x++)
+        for (int x = 0; x < gridData.gridSize.x; x++)
         {
-            for (int y = 0; y < gridData.GridSize.y; y++)
+            for (int y = 0; y < gridData.gridSize.y; y++)
             {
-                List<int> lineClues = CountLine((z) => new Vector3Int(x, y, z), gridData.GridSize.z);
+                List<int> lineClues = CountLine((z) => new Vector3Int(x, y, z), gridData.gridSize.z);
                 clues[$"Z_{x}_{y}"] = lineClues;
             }
         }

@@ -9,7 +9,13 @@ public enum EditMode
 
 public class ChangeEditMode : MonoBehaviour
 {
-    [SerializeField] private LevelEditor _levelEditor;
+    private LevelEditor _levelEditor;
+
+    private void Awake()
+    {
+        _levelEditor = GetComponent<LevelEditor>();
+    }
+
     public void OnEditModeChange(int i)
     {
         _levelEditor.SetEditMode((EditMode)i);

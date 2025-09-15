@@ -8,9 +8,12 @@ public class VoxelData : MonoBehaviour
     public void Initialize(Vector3Int pos, Color color )
     {
         GridPosition = pos;
-        transform.position = GridPosition;
 
         this.VoxelColor = color;
 
+        rend = GetComponent<Renderer>();
+        rend.material.color = VoxelColor;
     }
+
+    public void SetColor(Color color) => VoxelColor = color;    
 }

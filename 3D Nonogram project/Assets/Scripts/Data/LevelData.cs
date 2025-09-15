@@ -1,19 +1,27 @@
+using System;
 using UnityEngine;
 
-[SerializeField]
+[Serializable]
 public class LevelData
 {
     [Header("Creator Data")]
-    public string LevelName { get; private set; }
-    public string AuthorName { get; private set; }
-    public string Description { get; private set; }
+    public string LevelName;
+    public string AuthorName;
+    public string Description;
 
     [Header("Level Stats")]
-    public int Likes { get; private set; }
-    public int Plays { get; private set; }
-    public int AverageClearTimeInSeconds { get; private set; }
+    public int Likes;
+    public int Plays;
+    public int AverageClearTimeInSeconds;
 
     [Header("Level Creation Data")]
-    public VoxelData[] VoxelData { get; private set; }
-    public GridData GridData {get; private set;}
+    public GridData GridData;
+
+    public LevelData(string lvlName, string authorName, string desc, GridData gridData)
+    {
+        LevelName = lvlName;
+        AuthorName = authorName;
+        Description = desc;
+        GridData = gridData;
+    }
 }

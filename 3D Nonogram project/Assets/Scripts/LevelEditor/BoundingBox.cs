@@ -8,9 +8,7 @@ public class BoundingBox : MonoBehaviour
     [SerializeField] private GameObject _xPlane, _minXPlane;
     [SerializeField] private GameObject _yPlane, _minYPlane;
     [SerializeField] private GameObject _zPlane, _minZPlane;
-
     [field: SerializeField] public Vector3Int GridSize { get; private set; }
-
     public void SetGridSize(Vector3Int size)
     {
         GridSize = size;

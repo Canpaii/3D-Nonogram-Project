@@ -6,20 +6,22 @@ public class LevelEditor : MonoBehaviour
     [SerializeField] private GameObject _voxel;
     [SerializeField] private GameObject _transparentVoxel;
     [SerializeField] private Transform voxelParent;
-    [SerializeField] private LayerMask voxelLayer; // assign layer(s) that contain voxels
-    [SerializeField] private float maxDistance = 50f;
-    [SerializeField] private int maxHitsBuffer = 2;
+    [SerializeField] private LayerMask voxelLayer; 
+    [SerializeField] private float maxDistance;
+    [SerializeField] private int maxHitsBuffer;
 
     public Vector3Int GridSize { get; private set; }
 
     private Camera _mainCam;
     private RaycastHit[] _hitBuffer;
+    private GameObject voxelHit;    
     private Vector3Int _lastGridPos;
     private Vector3 _lastMousePos = Vector3.negativeInfinity;
     private Transform _transparentT;
     private RaycastHit _currentHit;
     public bool hasHit;
     private EditMode _editMode;
+    private GridData _data = new GridData();
 
     private void Awake()
     {
@@ -30,7 +32,7 @@ public class LevelEditor : MonoBehaviour
 
     private void Update()
     {
-        // Only raycast if the mouse moved (reduces work massively)
+        // Only raycast if the mouse moved 
         if (Input.mousePosition != _lastMousePos)
         {
             _lastMousePos = Input.mousePosition;
@@ -50,7 +52,7 @@ public class LevelEditor : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && !IsInsideGrid(gridPos))
         {
-            HandleClick(gridPos);
+            HandleClick(gridPos, voxelHit);
         }
     }
 
@@ -84,6 +86,11 @@ public class LevelEditor : MonoBehaviour
             if (first >= 0 && second >= 0)
             {
                 _currentHit = _hitBuffer[second];
+
+                // Just need a small check because I dont want to destroy the bounding box
+                if(_currentHit.collider.transform.tag == "a") voxelHit = _currentHit.collider.gameObject;
+                
+
                 Debug.Log(_currentHit);
                 hasHit = true;
                 return;
@@ -93,19 +100,41 @@ public class LevelEditor : MonoBehaviour
         hasHit = false;
     }
 
-    private void HandleClick(Vector3Int gridPos)
+    private void HandleClick(Vector3Int gridPos, GameObject voxel = null)
     {
+
         switch (_editMode)
         {
             case EditMode.Place:
+
+                if(_data.voxelsInGrid.ContainsKey(gridPos)) return;
+
                 GameObject voxelInstance = Instantiate(_voxel, gridPos, Quaternion.identity);
                 voxelInstance.transform.SetParent(voxelParent, true);
 
-                // Add to a list or array 
+                voxelInstance.GetComponent<VoxelData>().Initialize(gridPos, _color);
+                
+                // Add to a list or array s, s
+                _data.AddVoxelInGridData(gridPos, voxelInstance.GetComponent<VoxelData>());
+
+                ShootRayCast();
                 break;
+
             case EditMode.Erase:
+                if (voxel == null) return;  
+
+                Destroy(voxel);
+                _data.RemoveVoxel(gridPos);
+
+                
+
+                ShootRayCast();
                 break;
             case EditMode.Paint:
+                if (voxel == null) return;
+
+                voxel.GetComponent<VoxelData>().SetColor(_color);
+
                 break;
         }
     }
@@ -131,8 +160,22 @@ public class LevelEditor : MonoBehaviour
         return Vector3Int.RoundToInt(hitPoint + normal * 0.5f);
     }
 
+    public void CreateSaveFile()
+    {
+        JsonUtility.ToJson(_data);
+    }
+
+    public void LoadSaveFile(string jsonString)
+    {
+       _data = JsonUtility.FromJson<GridData>(jsonString);
+    }
+
+    public void SaveData(string jsonString)
+    {
+        JsonUtility.FromJsonOverwrite(jsonString, _data);
+    }
 
     public void SetEditMode(EditMode editMode) => _editMode = editMode;
     public void SetColor(Color color) => _color = color;
-    public void SetGridSize(Vector3Int v3Int) => GridSize = v3Int;  
+    public void SetGridSize(Vector3Int v3Int) => GridSize = v3Int;
 }

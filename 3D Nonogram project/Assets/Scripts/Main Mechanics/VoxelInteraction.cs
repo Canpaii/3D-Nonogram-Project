@@ -11,9 +11,9 @@ public class VoxelInteraction : MonoBehaviour
     {
         _cam = Camera.main;
     }
-    public void SetInteractionType(InteractionType iType)
+    public void SetInteractionType(InteractionType interactionType)
     {
-        interactionType = iType;
+        this.interactionType = interactionType;
     }
 
     private void Update()
