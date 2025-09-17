@@ -3,16 +3,15 @@ public class VoxelData : MonoBehaviour
 {
     public Vector3Int GridPosition { get; private set; }
     public Color VoxelColor { get; private set; }
-    private Renderer rend;
-
+    private Renderer _rend;
     public void Initialize(Vector3Int pos, Color color )
     {
         GridPosition = pos;
 
         this.VoxelColor = color;
 
-        rend = GetComponent<Renderer>();
-        rend.material.color = VoxelColor;
+        _rend = GetComponent<Renderer>();
+        _rend.material.color = VoxelColor;
     }
 
     public void SetColor(Color color) => VoxelColor = color;    

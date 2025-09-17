@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEngine;
 
 public class LevelEditor : MonoBehaviour
@@ -9,7 +10,7 @@ public class LevelEditor : MonoBehaviour
     [SerializeField] private LayerMask voxelLayer; 
     [SerializeField] private float maxDistance;
     [SerializeField] private int maxHitsBuffer;
-
+    [SerializeField] private LoadMenu menu;
     public Vector3Int GridSize { get; private set; }
 
     private Camera _mainCam;
@@ -19,9 +20,9 @@ public class LevelEditor : MonoBehaviour
     private Vector3 _lastMousePos = Vector3.negativeInfinity;
     private Transform _transparentT;
     private RaycastHit _currentHit;
-    public bool hasHit;
+    private bool _hasHit;
     private EditMode _editMode;
-    private GridData _data = new GridData();
+    private GridSaveData _data = new GridSaveData();
 
     private void Awake()
     {
@@ -30,6 +31,10 @@ public class LevelEditor : MonoBehaviour
         if (_transparentVoxel) _transparentT = _transparentVoxel.transform;
     }
 
+    private void Start()
+    {
+        menu.RefreshSaveList();
+    }
     private void Update()
     {
         // Only raycast if the mouse moved 
@@ -39,7 +44,7 @@ public class LevelEditor : MonoBehaviour
             ShootRayCast();
         }
 
-        if (!hasHit) return;
+        if (!_hasHit) return;
 
         Vector3 hitPos = _currentHit.point;
         
@@ -92,12 +97,12 @@ public class LevelEditor : MonoBehaviour
                 
 
                 Debug.Log(_currentHit);
-                hasHit = true;
+                _hasHit = true;
                 return;
             }
         }
 
-        hasHit = false;
+        _hasHit = false;
     }
 
     private void HandleClick(Vector3Int gridPos, GameObject voxel = null)
@@ -106,35 +111,48 @@ public class LevelEditor : MonoBehaviour
         switch (_editMode)
         {
             case EditMode.Place:
-
-                if(_data.voxelsInGrid.ContainsKey(gridPos)) return;
+                if (_data.voxelMap.ContainsKey(gridPos)) return;
 
                 GameObject voxelInstance = Instantiate(_voxel, gridPos, Quaternion.identity);
                 voxelInstance.transform.SetParent(voxelParent, true);
 
                 voxelInstance.GetComponent<VoxelData>().Initialize(gridPos, _color);
-                
-                // Add to a list or array s, s
-                _data.AddVoxelInGridData(gridPos, voxelInstance.GetComponent<VoxelData>());
+
+                VoxelSaveData voxelSaveData = new VoxelSaveData(gridPos, _color);
+
+                _data.voxelMap.Add(gridPos, voxelSaveData);
+                _data.voxels.Add(voxelSaveData);
 
                 ShootRayCast();
                 break;
 
             case EditMode.Erase:
-                if (voxel == null) return;  
+                if (voxel == null) return;
+
+                Vector3Int pos = voxel.GetComponent<VoxelData>().GridPosition;
+
+                // Remove from dictionary and list
+                if (_data.voxelMap.ContainsKey(pos))
+                {
+                    VoxelSaveData sData = _data.voxelMap[pos];
+
+                    _data.voxels.Remove(sData);
+                    _data.voxelMap.Remove(pos);
+                }
 
                 Destroy(voxel);
-                _data.RemoveVoxel(gridPos);
-
-                
 
                 ShootRayCast();
                 break;
+
             case EditMode.Paint:
                 if (voxel == null) return;
 
-                voxel.GetComponent<VoxelData>().SetColor(_color);
+                VoxelData vData = voxel.GetComponent<VoxelData>();
+                vData.SetColor(_color);
 
+                if (_data.voxelMap.TryGetValue(vData.GridPosition, out VoxelSaveData saveData))
+                    saveData.voxelColor = _color;
                 break;
         }
     }
@@ -160,20 +178,18 @@ public class LevelEditor : MonoBehaviour
         return Vector3Int.RoundToInt(hitPoint + normal * 0.5f);
     }
 
-    public void CreateSaveFile()
-    {
-        JsonUtility.ToJson(_data);
+    public void SaveFile(string fileName)
+    { 
+
+        SaveLoadSystem.Save(_data ,fileName);
     }
 
-    public void LoadSaveFile(string jsonString)
+    public void LoadSaveFile(string fileName)
     {
-       _data = JsonUtility.FromJson<GridData>(jsonString);
+        _data = SaveLoadSystem.Load<GridSaveData>(fileName);
     }
 
-    public void SaveData(string jsonString)
-    {
-        JsonUtility.FromJsonOverwrite(jsonString, _data);
-    }
+   
 
     public void SetEditMode(EditMode editMode) => _editMode = editMode;
     public void SetColor(Color color) => _color = color;
