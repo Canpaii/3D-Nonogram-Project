@@ -1,17 +1,18 @@
-using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LevelEditor : MonoBehaviour
 {
     [SerializeField] private Color _color;
     [SerializeField] private GameObject _voxel;
     [SerializeField] private GameObject _transparentVoxel;
-    [SerializeField] private Transform voxelParent;
-    [SerializeField] private LayerMask voxelLayer; 
-    [SerializeField] private float maxDistance;
-    [SerializeField] private int maxHitsBuffer;
-    [SerializeField] private LoadMenu menu;
-    public Vector3Int GridSize { get; private set; }
+    [SerializeField] private Transform _voxelParent;
+    [SerializeField] private LayerMask _voxelLayer; 
+    [SerializeField] private float _maxDistance;
+    [SerializeField] private int _maxHitsBuffer;
+    [SerializeField] private LoadMenu _menu;
+    [SerializeField] private BoundingBox _boundingBox;
 
     private Camera _mainCam;
     private RaycastHit[] _hitBuffer;
@@ -27,14 +28,10 @@ public class LevelEditor : MonoBehaviour
     private void Awake()
     {
         _mainCam = Camera.main; // cache once
-        _hitBuffer = new RaycastHit[maxHitsBuffer];
+        _hitBuffer = new RaycastHit[_maxHitsBuffer];
         if (_transparentVoxel) _transparentT = _transparentVoxel.transform;
     }
 
-    private void Start()
-    {
-        menu.RefreshSaveList();
-    }
     private void Update()
     {
         // Only raycast if the mouse moved 
@@ -55,19 +52,19 @@ public class LevelEditor : MonoBehaviour
             _lastGridPos = gridPos;
         }
 
-        if (Input.GetMouseButtonDown(0) && !IsInsideGrid(gridPos))
+        if (Input.GetMouseButtonDown(0) && IsInsideGrid(gridPos))
         {
             HandleClick(gridPos, voxelHit);
         }
     }
 
-    // This function I still dont fully understand but it works for now
+    // I still dont fully understand this function  but it works for now
     private void ShootRayCast()
     {
         Ray ray = _mainCam.ScreenPointToRay(_lastMousePos);
 
         // Use RaycastNonAlloc to avoid allocations.
-        int hits = Physics.RaycastNonAlloc(ray, _hitBuffer, maxDistance, voxelLayer, QueryTriggerInteraction.Ignore);
+        int hits = Physics.RaycastNonAlloc(ray, _hitBuffer, _maxDistance, _voxelLayer, QueryTriggerInteraction.Ignore);
 
         if (hits >= 2)
         {
@@ -114,7 +111,7 @@ public class LevelEditor : MonoBehaviour
                 if (_data.voxelMap.ContainsKey(gridPos)) return;
 
                 GameObject voxelInstance = Instantiate(_voxel, gridPos, Quaternion.identity);
-                voxelInstance.transform.SetParent(voxelParent, true);
+                voxelInstance.transform.SetParent(_voxelParent, true);
 
                 voxelInstance.GetComponent<VoxelData>().Initialize(gridPos, _color);
 
@@ -166,7 +163,7 @@ public class LevelEditor : MonoBehaviour
     // This doesn't work yet
     private bool IsInsideGrid(Vector3Int gridPos)
     {
-        Vector3Int halfSize = GridSize / 2; 
+        Vector3Int halfSize = _boundingBox.GridSize / 2;
 
         return gridPos.x >= -halfSize.x && gridPos.x <= halfSize.x &&
                gridPos.y >= -halfSize.y && gridPos.y <= halfSize.y &&
@@ -186,12 +183,32 @@ public class LevelEditor : MonoBehaviour
 
     public void LoadSaveFile(string fileName)
     {
-        _data = SaveLoadSystem.Load<GridSaveData>(fileName);
-    }
+        foreach (Transform child in _voxelParent)
+        {
+            Destroy(child.gameObject);
+        }
 
-   
+        _data = SaveLoadSystem.Load<GridSaveData>(fileName);
+
+        if (_data == null) return; 
+
+        _boundingBox.LoadGridSize(_data.gridSize);
+
+        // Rebuild Dictionary for easy look ups
+        _data.voxelMap = new Dictionary<Vector3Int, VoxelSaveData>();
+        foreach (VoxelSaveData v in _data.voxels)
+        {
+            _data.voxelMap[v.gridPosition] = v;
+
+            GameObject voxelInstance = Instantiate(_voxel, v.gridPosition, Quaternion.identity);
+            voxelInstance.transform.SetParent(_voxelParent, true);
+
+            voxelInstance.GetComponent<VoxelData>().SetGridPosition(v.gridPosition);
+            voxelInstance.GetComponent<VoxelData>().SetColor(v.voxelColor);
+        }
+    }
 
     public void SetEditMode(EditMode editMode) => _editMode = editMode;
     public void SetColor(Color color) => _color = color;
-    public void SetGridSize(Vector3Int v3Int) => GridSize = v3Int;
+    public void SetGridSize(Vector3Int gridSize) => _data.gridSize = gridSize;
 }

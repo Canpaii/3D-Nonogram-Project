@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public static class SaveLoadSystem
@@ -19,7 +20,7 @@ public static class SaveLoadSystem
         Debug.Log($"[SaveSystem] Saved to {path}");
     }
 
-    // Load data from a file
+    // Load data from a file. bars <-- Nobe
     public static T Load<T>(string fileName)
     {
         string path = Path.Combine(SaveFolder, fileName + ".json");
@@ -38,9 +39,15 @@ public static class SaveLoadSystem
     public static List<string> GetAllSaveFiles()
     {
         if (!Directory.Exists(SaveFolder))
+        {
+            Debug.LogWarning("Save folder does not exist: " + SaveFolder);
             return new List<string>();
+        }
 
         string[] files = Directory.GetFiles(SaveFolder, "*.json");
+
+        Debug.Log(files.Length);
+
         List<string> fileNames = new List<string>();
 
         foreach (string file in files)

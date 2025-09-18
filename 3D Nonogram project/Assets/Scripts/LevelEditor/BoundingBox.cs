@@ -1,5 +1,6 @@
 using UnityEngine;
-
+using UnityEngine.UI;
+using TMPro;
 public class BoundingBox : MonoBehaviour
 {
     // This will be done really cursed, But I simply dont know any other method
@@ -8,22 +9,22 @@ public class BoundingBox : MonoBehaviour
     [SerializeField] private GameObject _xPlane, _minXPlane;
     [SerializeField] private GameObject _yPlane, _minYPlane;
     [SerializeField] private GameObject _zPlane, _minZPlane;
+
+    [SerializeField] private Slider _sliderX, _sliderY, _sliderZ;
+    [SerializeField] private TMP_Text _textX, _textY, _textZ;
+
+    [SerializeField] private LevelEditor _levelEditor;
     [field: SerializeField] public Vector3Int GridSize { get; private set; }
-    public void SetGridSize(Vector3Int size)
-    {
-        GridSize = size;
-        AdjustPlaneScales();
-    }
 
-    public void SetGridSizeTest()
+
+    public void SetGridSizeTest() // button test
     {
         AdjustPlaneScales();
     }
 
-    public void AdjustPlaneScales()
+    private void AdjustPlaneScales()
     {
         // Change scale 
-
         _xPlane.transform.localScale = new Vector3(0.1f, GridSize.y, GridSize.z);
         _minXPlane.transform.localScale = new Vector3(0.1f, GridSize.y, GridSize.z);
 
@@ -47,5 +48,34 @@ public class BoundingBox : MonoBehaviour
 
         _zPlane.transform.position = new Vector3(0, 0, zPlanePos);
         _minZPlane.transform.position = new Vector3(0, 0, -zPlanePos);
+
+        _levelEditor.SetGridSize(GridSize);
+    }
+
+    public void LoadGridSize(Vector3Int gridSize)
+    {
+        GridSize = gridSize;
+
+        AdjustPlaneScales();
+    }
+
+    public void SetGridSizeX()
+    {
+        GridSize = new Vector3Int(((int)_sliderX.value), GridSize.y, GridSize.z);
+        _textX.text = $"X: {(int)_sliderX.value}";
+        AdjustPlaneScales();
+    }
+
+    public void SetGridSizeY()
+    {
+        GridSize = new Vector3Int(GridSize.x, (int)_sliderY.value, GridSize.z);
+        _textY.text = $"Y: {(int)_sliderY.value}";
+        AdjustPlaneScales();
+    }
+    public void SetGridSizeZ()
+    {
+        GridSize = new Vector3Int(GridSize.x, GridSize.y, (int)_sliderZ.value);
+        _textZ.text = $"Z: {(int)_sliderZ.value}";
+        AdjustPlaneScales();
     }
 }

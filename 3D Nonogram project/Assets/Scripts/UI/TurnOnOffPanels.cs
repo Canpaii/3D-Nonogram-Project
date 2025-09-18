@@ -4,8 +4,9 @@ using UnityEngine;
 [Serializable]
 public struct PanelsToChange
 {
-    public GameObject panelToTurnOn;
-    public GameObject panelToTurnOff;
+    public string name;
+    public GameObject[] panelToTurnOn;
+    public GameObject[] panelToTurnOff;
 }
 public class TurnOnOffPanels : MonoBehaviour
 {
@@ -13,7 +14,13 @@ public class TurnOnOffPanels : MonoBehaviour
 
     public void ChangePanels(int i)
     {
-        panels[i].panelToTurnOn.SetActive(true);
-        panels[i].panelToTurnOff.SetActive(false);
+        for (int j = 0; j < panels[i].panelToTurnOff.Length; j++)
+        {
+            panels[i].panelToTurnOff[j].SetActive(false);
+        }
+        for (int k = 0; k < panels[i].panelToTurnOn.Length; k++)
+        {
+            panels[i].panelToTurnOn[k].SetActive(true);
+        }
     }
 }
