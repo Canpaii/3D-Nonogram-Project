@@ -13,6 +13,8 @@ public class LevelEditor : MonoBehaviour
     [SerializeField] private int _maxHitsBuffer;
     [SerializeField] private LoadMenu _menu;
     [SerializeField] private BoundingBox _boundingBox;
+    [SerializeField] private UploadLevelData _uploadLevelData;
+
 
     private Camera _mainCam;
     private RaycastHit[] _hitBuffer;
@@ -206,6 +208,22 @@ public class LevelEditor : MonoBehaviour
             voxelInstance.GetComponent<VoxelData>().SetGridPosition(v.gridPosition);
             voxelInstance.GetComponent<VoxelData>().SetColor(v.voxelColor);
         }
+    }
+
+    public void UploadLevelData()
+    {
+        print("Sending request");
+        StartCoroutine(_uploadLevelData.UploadLevel(_data));
+        
+    }
+    public void ClearAllVoxels()
+    {
+        foreach (Transform child in _voxelParent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        _data.voxelMap.Clear();
     }
 
     public void SetEditMode(EditMode editMode) => _editMode = editMode;

@@ -55,8 +55,9 @@ public class BoundingBox : MonoBehaviour
     public void LoadGridSize(Vector3Int gridSize)
     {
         GridSize = gridSize;
-
+      
         AdjustPlaneScales();
+        AdjustSlider();
     }
 
     public void SetGridSizeX()
@@ -77,5 +78,17 @@ public class BoundingBox : MonoBehaviour
         GridSize = new Vector3Int(GridSize.x, GridSize.y, (int)_sliderZ.value);
         _textZ.text = $"Z: {(int)_sliderZ.value}";
         AdjustPlaneScales();
+    }
+
+    private void AdjustSlider()
+    {
+        _sliderX.value = GridSize.x;
+        _textX.text = "X: " + GridSize.x.ToString();
+
+        _sliderY.value = GridSize.y;
+        _textY.text = "Y: " + GridSize.y.ToString();
+
+        _sliderZ.value = GridSize.z;
+        _textZ.text = "Z: " + GridSize.z.ToString();
     }
 }

@@ -3,17 +3,17 @@ using UnityEngine;
 public class LevelCreation : MonoBehaviour
 {
     // This script is for instancing the puzzle when a level gets selected, not for making the level itself
-    public LevelData LevelData { get; private set; }
+    public LevelSaveData LevelData { get; private set; }
     [SerializeField] private GameObject voxelPrefab;
 
-    public void SetCurrentSelectedLevel(LevelData levelData)
+    public void SetCurrentSelectedLevel(LevelSaveData levelData)
     {
         LevelData = levelData;
     }
 
     public void GenerateLevel()
     {
-       /* foreach (VoxelData voxel in LevelData.GridData.voxelsInGrid)
+       /* foreach (VoxelData voxel in LevelSaveData.GridData.voxelsInGrid)
         {
             GameObject voxelInstance = Instantiate(voxelPrefab, voxel.GridPosition, Quaternion.identity);
 
@@ -21,10 +21,10 @@ public class LevelCreation : MonoBehaviour
             voxelInstance.GetComponent<Voxel>().SetVoxelType(true);
         }*/
         
-        foreach (Vector3Int emptyPos in LevelData.GridData.emptySpaces)
-        {
-            GameObject voxelInstance = Instantiate(voxelPrefab, emptyPos, Quaternion.identity);
-            voxelInstance.GetComponent<Voxel>().SetVoxelType(false);
-        }
+        //foreach (Vector3Int emptyPos in LevelSaveData.GridData.emptySpaces)
+        //{
+        //    GameObject voxelInstance = Instantiate(voxelPrefab, emptyPos, Quaternion.identity);
+        //    voxelInstance.GetComponent<Voxel>().SetVoxelType(false);
+        //}
     }
 }

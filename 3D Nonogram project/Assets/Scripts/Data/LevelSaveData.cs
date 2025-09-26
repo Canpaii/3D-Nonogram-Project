@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class LevelData
+public class LevelSaveData
 {
     [Header("Creator Data")]
     public string LevelName;
@@ -15,9 +15,9 @@ public class LevelData
     public int AverageClearTimeInSeconds;
 
     [Header("Level Creation Data")]
-    public GridData GridData;
+    public GridSaveData GridData;
 
-    public LevelData(string lvlName, string authorName, string desc, GridData gridData)
+    public LevelSaveData(string lvlName, string authorName, string desc, GridSaveData gridData)
     {
         LevelName = lvlName;
         AuthorName = authorName;
