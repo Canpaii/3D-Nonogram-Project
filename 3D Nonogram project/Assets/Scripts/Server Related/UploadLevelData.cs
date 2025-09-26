@@ -11,10 +11,9 @@ public class UploadLevelData : MonoBehaviour
     public string AuthorName { get; private set; }
     public string Description { get; private set; }
 
-    [SerializeField] private TMP_InputField lvlName, authName, desc;
+    [SerializeField] private TMP_InputField _lvlName, _authName, _desc;
     public IEnumerator UploadLevel(GridSaveData data)
     {
-        print("received req");
         LevelSaveData levelData = new LevelSaveData(LevelName, AuthorName, Description, data);
         string rawFileName = $"{AuthorName}_{LevelName}";
         string safeFileName = MakeSafeFileName(rawFileName);
@@ -63,16 +62,15 @@ public class UploadLevelData : MonoBehaviour
 
     public void SetLevelName()
     {
-        LevelName = lvlName.text;
-        print(LevelName);
+        LevelName = _lvlName.text;
     }    
     public void SetAuthorName()
     {
-        AuthorName = authName.text;
+        AuthorName = _authName.text;
     }
         
     public void SetDescription()
     {
-        Description = desc.text;
+        Description = _desc.text;
     }
 }
