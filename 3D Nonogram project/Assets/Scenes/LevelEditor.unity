@@ -372,9 +372,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8391d79aceb9dd1489abfcd4a25991e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lvlName: {fileID: 1473390277}
-  authName: {fileID: 1349391196}
-  desc: {fileID: 601064585}
+  _lvlName: {fileID: 1473390277}
+  _authName: {fileID: 1349391196}
+  _desc: {fileID: 601064585}
 --- !u!4 &105232545
 Transform:
   m_ObjectHideFlags: 0
