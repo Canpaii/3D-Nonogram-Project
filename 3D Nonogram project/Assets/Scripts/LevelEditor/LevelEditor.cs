@@ -212,7 +212,7 @@ public class LevelEditor : MonoBehaviour
 
     public void UploadLevelData()
     {
-        StartCoroutine(_uploadLevelData.UploadLevel(_data));
+        _uploadLevelData.UploadCoroutine(_data);
     }
     public void ClearAllVoxels()
     {
