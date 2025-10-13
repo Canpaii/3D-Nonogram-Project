@@ -1,30 +1,40 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelCreation : MonoBehaviour
 {
     // This script is for instancing the puzzle when a level gets selected, not for making the level itself
-    public LevelSaveData LevelData { get; private set; }
-    [SerializeField] private GameObject voxelPrefab;
 
-    public void SetCurrentSelectedLevel(LevelSaveData levelData)
-    {
-        LevelData = levelData;
-    }
+    [SerializeField] private LevelDataSO levelData;
+    [SerializeField] private Voxel voxelPrefab;
+
+    private Dictionary<Vector3Int, Voxel> voxelsInGrid = new Dictionary<Vector3Int, Voxel>();
 
     public void GenerateLevel()
     {
-       /* foreach (VoxelData voxel in LevelSaveData.GridData.voxelsInGrid)
+        foreach (var item in levelData.Data.GridData.voxels)
         {
-            GameObject voxelInstance = Instantiate(voxelPrefab, voxel.GridPosition, Quaternion.identity);
+            Voxel voxelInstance = Instantiate(voxelPrefab,item.gridPosition, Quaternion.identity);
 
-            voxelInstance.GetComponent<Voxel>().Initialize(voxel.VoxelColor);
-            voxelInstance.GetComponent<Voxel>().SetVoxelType(true);
-        }*/
-        
-        //foreach (Vector3Int emptyPos in LevelSaveData.GridData.emptySpaces)
-        //{
-        //    GameObject voxelInstance = Instantiate(voxelPrefab, emptyPos, Quaternion.identity);
-        //    voxelInstance.GetComponent<Voxel>().SetVoxelType(false);
-        //}
+            voxelInstance.SetVoxelType(true);
+            voxelsInGrid[item.gridPosition] = voxelInstance;
+        }
+
+        for (int x = 0; x < levelData.Data.GridData.gridSize.x; x++)
+        {
+            for (int y = 0; y < levelData.Data.GridData.gridSize.y; y++)
+            {
+                for (int z = 0; z < levelData.Data.GridData.gridSize.z; z++)
+                {
+                    Vector3Int pos = new Vector3Int(x, y, z);
+                    if (!voxelsInGrid.ContainsKey(pos)) // fill in empty spaces
+                    {
+                        Voxel fillerVoxelInstance = Instantiate(voxelPrefab, pos, Quaternion.identity);
+                        fillerVoxelInstance.SetVoxelType(false);
+                    }
+                }
+            }
+
+        }
     }
 }

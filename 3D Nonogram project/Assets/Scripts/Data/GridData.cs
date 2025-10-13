@@ -8,10 +8,10 @@ public class GridData : MonoBehaviour
     public Vector3Int gridSize;  // Needs to be public for JSON 
 
     // Keep track what positions are filled in to know what places need to be filled with filler voxels.
-    public Dictionary<Vector3Int, VoxelData> voxelsInGrid = new Dictionary<Vector3Int, VoxelData>();
+    public Dictionary<Vector3Int, VoxelSaveData> voxelsInGrid = new Dictionary<Vector3Int, VoxelSaveData>();
     public List<Vector3Int> emptySpaces = new List<Vector3Int>();
 
-    public void AddVoxelInGridData(Vector3Int gridPOS, VoxelData voxel)
+    public void AddVoxelInGridData(Vector3Int gridPOS, VoxelSaveData voxel)
     {
         voxelsInGrid.Add(gridPOS, voxel);
     }
@@ -31,9 +31,9 @@ public class GridData : MonoBehaviour
         voxelsInGrid.Remove(pos);
     }
 
-    public VoxelData GetVoxel(Vector3Int pos)
+    public VoxelSaveData GetVoxel(Vector3Int pos)
     {
-        voxelsInGrid.TryGetValue(pos, out VoxelData voxel);
+        voxelsInGrid.TryGetValue(pos, out VoxelSaveData voxel);
         return voxel;
     }
 

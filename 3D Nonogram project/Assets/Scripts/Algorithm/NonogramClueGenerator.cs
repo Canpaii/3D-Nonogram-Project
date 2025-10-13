@@ -5,7 +5,6 @@ public class NonogramClueGenerator : MonoBehaviour
 {
     public GridData gridData;
 
-
     // Returns all clues, keyed by which axis/line they belong to.
     public Dictionary<string, List<int>> GenerateClues()
     {
