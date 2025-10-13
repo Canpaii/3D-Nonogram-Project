@@ -10,6 +10,10 @@ public class LevelCreation : MonoBehaviour
 
     private Dictionary<Vector3Int, Voxel> voxelsInGrid = new Dictionary<Vector3Int, Voxel>();
 
+    public void Start()
+    {
+        GenerateLevel();
+    }
     public void GenerateLevel()
     {
         foreach (var item in levelData.Data.GridData.voxels)

@@ -2,7 +2,13 @@ using UnityEngine;
 
 public class LevelDataContainer : MonoBehaviour
 {
+    public static LevelDataContainer Instance;
+    [SerializeField] private LevelDataSO _data;
 
-    public LevelDataSO Data { get; private set; }
-    public void SetLevelData(LevelDataSO data) => Data = data;
+    public void SetLevelData(LevelDataSO data) => _data = data;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 }

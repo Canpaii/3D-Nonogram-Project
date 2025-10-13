@@ -25,7 +25,7 @@ public class UploadLevelData : MonoBehaviour
 
         // pretty print true, for debugging will need to turn it to false later
         string json = JsonUtility.ToJson(levelData, true); 
-        string url = $"https://5b685f8e6d16.ngrok-free.app/upload?name={UnityWebRequest.EscapeURL(safeFileName)}";
+        string url = $"https://db08756d6d51.ngrok-free.app/upload?name={UnityWebRequest.EscapeURL(safeFileName)}";
 
         // Turn json to bytes, the flask server decodes it back to text
         byte[] body = Encoding.UTF8.GetBytes(json);

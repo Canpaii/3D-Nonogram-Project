@@ -11,15 +11,16 @@ public class LevelList
 
 public class ServerList : MonoBehaviour
 {
-    public Button button;
-    [SerializeField] 
+    [SerializeField] private LevelButton button;
+    [SerializeField] private DownloadLevels downloadLvls;
+    [SerializeField] private Transform contenObject;
     public void ListCoroutine()
     {
         StartCoroutine(ListLevels());
     }
     private IEnumerator ListLevels()
     {
-        string url = "http://<url>:5000/list";
+        string url = "https://db08756d6d51.ngrok-free.app/list";
         UnityWebRequest request = UnityWebRequest.Get(url);
         yield return request.SendWebRequest();
 
@@ -34,15 +35,22 @@ public class ServerList : MonoBehaviour
 
             foreach (var level in list.levels)
             {
-                Button buttonInstance = Instantiate(button, transform);
-                buttonInstance.transform.SetParent(transform, false);
+                LevelButton buttonInstance = Instantiate(button, transform);
+                buttonInstance.Initialize(level, downloadLvls);
+
+                buttonInstance.transform.SetParent(contenObject, false);
+                
+                buttonInstance.GetComponent<Button>().onClick.AddListener(()=> downloadLvls.StartDownloadCoroutine(level));
+
+                if (buttonInstance.GetComponent<Button>() == null)
+                {
+                    print("Error");
+                }
             }
         }
         else
         {
             Debug.LogError("Error: " + request.error);
         }
-
-      
     }
 }

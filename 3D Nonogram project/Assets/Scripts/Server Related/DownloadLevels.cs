@@ -2,13 +2,21 @@ using System.Collections;
 using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class DownloadLevels : MonoBehaviour
 {
     [SerializeField] private LevelDataSO so;
-    public IEnumerator DownloadLevel(string levelName)
+    [SerializeField] private string puzzleScene;
+
+    public void StartDownloadCoroutine(string name)
     {
-        string url = $"http://<pi-ip>:5000/download?name={levelName}";
+        print("PLS");
+        StartCoroutine(DownloadLevel(name));
+    }
+    private IEnumerator DownloadLevel(string levelName)
+    {
+        string url = $"https://db08756d6d51.ngrok-free.app/download?name={levelName}";
 
         UnityWebRequest request = UnityWebRequest.Get(url);
         yield return request.SendWebRequest();
@@ -21,6 +29,9 @@ public class DownloadLevels : MonoBehaviour
 
             // Step 2: Deserialize into a C# scriptable object
             so.Data = JsonUtility.FromJson<LevelSaveData>(json);
+
+            // Step 3: Swap scenes
+            SceneManager.LoadScene(puzzleScene);
         }
         else
         {
