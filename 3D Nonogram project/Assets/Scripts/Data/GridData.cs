@@ -37,21 +37,5 @@ public class GridData : MonoBehaviour
         return voxel;
     }
 
-    public void GetEmptySpaces() // Generate this after level is done in the level creator 
-    {
-        for (int x = 0; x < gridSize.x; x++)
-        {
-            for (int y = 0; y < gridSize.y; y++)
-            {
-                for (int z = 0; z < gridSize.z; z++)
-                {
-                    Vector3Int pos = new Vector3Int(x, y, z);
-                    if (!voxelsInGrid.ContainsKey(pos)) // not in dictionary
-                    {
-                        emptySpaces.Add(pos);
-                    }
-                }
-            }
-        } 
-    }
+ 
 }

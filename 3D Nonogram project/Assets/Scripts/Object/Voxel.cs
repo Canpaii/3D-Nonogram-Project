@@ -25,48 +25,53 @@ public class Voxel : MonoBehaviour
     [Header("Worldspace tekst")]
     public TMP_Text xAxis, yAxis, zAxis;
 
-    public TMP_Text minXAxis, minYAxis,minZAxis;
-  
+    public TMP_Text minXAxis, minYAxis, minZAxis;
+
     [Header("Voxel state")]
     private VoxelState state;
     private VoxelState previousState;
     public bool PuzzleVoxel { get; private set; } // Determines if the voxel is part of the puzzle or filler
 
     [Header("Materials and colors")]
-    public Color FinalColor {get; private set;}
+    public Color FinalColor { get; private set; }
 
     [SerializeField] private Material baseMaterial;
     [SerializeField] private Material markedMaterial;
-    [SerializeField] private Material colloredMaterial;
-    
+    [SerializeField] private Material paintedMaterial;
+
     private Renderer _rend;
+
+
+    private PuzzleManager puzzleManager; // Reference to central manager
 
     public void Awake()
     {
         _rend = GetComponent<Renderer>();
     }
-    public void Initialize(Color color)
+    public void Initialize(bool isPuzzleVoxel, PuzzleManager manager)
     {
-        FinalColor = color;
+        PuzzleVoxel = isPuzzleVoxel;
+        puzzleManager = manager;
+        _rend = GetComponent<Renderer>();
+        _rend.material = baseMaterial;
     }
-
-    public void SetClue(Axis axis, string number, bool isMinSide)
+    public void SetClue(Axis axis, string number)
     {
         switch (axis)
         {
             case Axis.X:
-                if (isMinSide) minXAxis.text = number;
-                else xAxis.text = number;
+                minXAxis.text = number;
+                xAxis.text = number;
                 break;
 
             case Axis.Y:
-                if (isMinSide) minYAxis.text = number;
-                else yAxis.text = number;
+                minYAxis.text = number;
+                yAxis.text = number;
                 break;
 
             case Axis.Z:
-                if (isMinSide) minZAxis.text = number;
-                else zAxis.text = number;
+                minZAxis.text = number;
+                zAxis.text = number;
                 break;
         }
     }
@@ -81,65 +86,55 @@ public class Voxel : MonoBehaviour
     {
         switch (iType)
         {
-            case InteractionType.Drag:
-                print("Drag");
-                // Do nothing, probably wanted to drag through the level
-                break;
+
             case InteractionType.Mark:
-                ChangeVoxelState(VoxelState.Marked);
+                MarkVoxel();
                 break;
             case InteractionType.Paint:
-                ChangeVoxelState(VoxelState.Painted);
+                TryPaint();
                 break;
             case InteractionType.Destroy:
-                ChangeVoxelState(VoxelState.Destroyed); 
+                TryDestroy();
                 break;
-             
+
         }
     }
-    private void ChangeVoxelState(VoxelState state)
+
+    private void TryPaint()
     {
-        previousState = state;
-        this.state = state;
-
-        switch (state)
+        if (!PuzzleVoxel)
         {
-            case VoxelState.Base:
-                _rend.material = baseMaterial;
-                break;
+            puzzleManager.ShowFeedback("Incorrect! That voxel shouldn't be painted.");
+            return;
+        }
 
-            case VoxelState.Marked:
-                _rend.material = markedMaterial;
-                break;
-
-            case VoxelState.Painted:
-                if (!PuzzleVoxel)
-                {
-                    // Point penalty since it is the wrong pieze being painted 
-                    state = previousState;
-
-                    return;
-                }
-
-                _rend.material = colloredMaterial;
-                break;
-
-            case VoxelState.Finished:
-                _rend.material = baseMaterial;
-                _rend.material.color = FinalColor;
-                break;
-
-            case VoxelState.Destroyed:
-                if (PuzzleVoxel)
-                {
-                    // Point penalty since it is the wrong piece being broken
-                    state = previousState;
-
-                    return;
-                }
-
-                break;
+        if (state != VoxelState.Painted)
+        {
+            state = VoxelState.Painted;
+            _rend.material = paintedMaterial;
+            puzzleManager.OnVoxelPainted();
         }
     }
-}
 
+    private void TryDestroy()
+    {
+        if (PuzzleVoxel)
+        {
+            puzzleManager.ShowFeedback("Incorrect! That voxel is part of the puzzle.");
+            return;
+        }
+
+        if (state != VoxelState.Destroyed)
+        {
+            state = VoxelState.Destroyed;
+            _rend.enabled = false; // hide it
+            puzzleManager.OnVoxelDestroyed();
+        }
+    }
+
+    private void MarkVoxel()
+    {
+        _rend.material = markedMaterial;
+    }
+
+}

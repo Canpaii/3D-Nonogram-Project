@@ -1,7 +1,11 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-
+public enum InteractionType
+{
+    Mark = 0,
+    Paint = 1,
+    Destroy = 2,
+}
 public class VoxelInteraction : MonoBehaviour
 {
     public InteractionType interactionType { get; private set; }
@@ -11,9 +15,9 @@ public class VoxelInteraction : MonoBehaviour
     {
         _cam = Camera.main;
     }
-    public void SetInteractionType(InteractionType interactionType)
+    public void SetInteractionType(int i)
     {
-        this.interactionType = interactionType;
+        this.interactionType = (InteractionType)i;
     }
 
     private void Update()

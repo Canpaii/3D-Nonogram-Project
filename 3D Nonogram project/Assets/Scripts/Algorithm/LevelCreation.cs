@@ -1,44 +1,45 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelCreation : MonoBehaviour
 {
-    // This script is for instancing the puzzle when a level gets selected, not for making the level itself
-
     [SerializeField] private LevelDataSO levelData;
     [SerializeField] private Voxel voxelPrefab;
+    [SerializeField] private PuzzleManager puzzleManager;
+    [SerializeField] private NonogramClueGenerator clueGenerator; // ?? assign in inspector
 
-    private Dictionary<Vector3Int, Voxel> voxelsInGrid = new Dictionary<Vector3Int, Voxel>();
+    private Voxel[,,] voxelGrid;
 
     public void Start()
     {
         GenerateLevel();
+        clueGenerator.GenerateAndAssignClues(voxelGrid);
     }
-    public void GenerateLevel()
+
+    private void GenerateLevel()
     {
-        foreach (var item in levelData.Data.GridData.voxels)
-        {
-            Voxel voxelInstance = Instantiate(voxelPrefab,item.gridPosition, Quaternion.identity);
+        GridSaveData data = levelData.Data.GridData;
+        Vector3Int size = data.gridSize;
+        voxelGrid = new Voxel[size.x, size.y, size.z];
 
-            voxelInstance.SetVoxelType(true);
-            voxelsInGrid[item.gridPosition] = voxelInstance;
-        }
+        int puzzleCount = data.voxels.Count;
+        int fillerCount = (size.x * size.y * size.z) - puzzleCount;
+        puzzleManager.Initialize(puzzleCount, fillerCount);
 
-        for (int x = 0; x < levelData.Data.GridData.gridSize.x; x++)
+        for (int x = 0; x < size.x; x++)
         {
-            for (int y = 0; y < levelData.Data.GridData.gridSize.y; y++)
+            for (int y = 0; y < size.y; y++)
             {
-                for (int z = 0; z < levelData.Data.GridData.gridSize.z; z++)
+                for (int z = 0; z < size.z; z++)
                 {
                     Vector3Int pos = new Vector3Int(x, y, z);
-                    if (!voxelsInGrid.ContainsKey(pos)) // fill in empty spaces
-                    {
-                        Voxel fillerVoxelInstance = Instantiate(voxelPrefab, pos, Quaternion.identity);
-                        fillerVoxelInstance.SetVoxelType(false);
-                    }
+                    bool isPuzzle = data.voxelMap.ContainsKey(pos);
+
+                    Voxel v = Instantiate(voxelPrefab, pos, Quaternion.identity);
+                    v.Initialize(isPuzzle, puzzleManager);
+
+                    voxelGrid[x, y, z] = v;
                 }
             }
-
         }
     }
 }

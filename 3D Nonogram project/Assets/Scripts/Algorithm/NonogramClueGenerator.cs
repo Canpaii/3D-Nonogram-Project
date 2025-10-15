@@ -3,46 +3,92 @@ using UnityEngine;
 
 public class NonogramClueGenerator : MonoBehaviour
 {
-    public GridData gridData;
+    public LevelDataSO levelData;
 
     // Returns all clues, keyed by which axis/line they belong to.
-    public Dictionary<string, List<int>> GenerateClues()
+    public void GenerateAndAssignClues(Voxel[,,] voxelGrid)
     {
-        var clues = new Dictionary<string, List<int>>();
-
-        // ----- X-axis lines: for each (y,z), scan x = 0..GridSize.x-1 -----
-        for (int y = 0; y < gridData.gridSize.y; y++)
+        Vector3Int size = levelData.Data.GridData.gridSize;
+        // X-axis lines (vary x, fixed y,z)
+        for (int y = 0; y < size.y; y++)
         {
-            for (int z = 0; z < gridData.gridSize.z; z++)
+            for (int z = 0; z < size.z; z++)
             {
-                // getPos maps index i → (x=i, y, z) for this line
-                List<int> lineClues = CountLine((x) => new Vector3Int(x, y, z), gridData.gridSize.x);
-                // store under a readable key; you can swap to a struct later if you like
-                clues[$"X_{y}_{z}"] = lineClues;
+                List<int> runs = CountLine(x => new Vector3Int(x, y, z), size.x);
+                string clueText;
+                if (runs.Count == 1 && runs[0] == 0)
+                {
+                    clueText = "0";  // no filled blocks in this line
+                }
+                else
+                {
+                    int total = 0;
+                    runs.ForEach(r => total += r);
+                    int sequences = runs.Count;
+                    // Format as total with sequences in superscript if multiple sequences
+                    clueText = (sequences > 1)
+                               ? total + "<sup>" + sequences + "</sup>"
+                               : total.ToString();
+                }
+                // Assign clue to the min and max X side voxels of this line:
+                Voxel minVoxel = voxelGrid[0, y, z];
+                Voxel maxVoxel = voxelGrid[size.x - 1, y, z];
+                minVoxel.SetClue(Axis.X, clueText);
+                maxVoxel.SetClue(Axis.X, clueText);
             }
         }
-
-        // ----- Y-axis lines: for each (x,z), scan y = 0..GridSize.y-1 -----
-        for (int x = 0; x < gridData.gridSize.x; x++)
+        // Y-axis lines (vary y, fixed x,z)
+        for (int x = 0; x < size.x; x++)
         {
-            for (int z = 0; z < gridData.gridSize.z; z++)
+            for (int z = 0; z < size.z; z++)
             {
-                List<int> lineClues = CountLine((y) => new Vector3Int(x, y, z), gridData.gridSize.y);
-                clues[$"Y_{x}_{z}"] = lineClues;
+                List<int> runs = CountLine(y => new Vector3Int(x, y, z), size.y);
+                string clueText;
+                if (runs.Count == 1 && runs[0] == 0)
+                {
+                    clueText = "0";
+                }
+                else
+                {
+                    int total = 0;
+                    runs.ForEach(r => total += r);
+                    int sequences = runs.Count;
+                    clueText = (sequences > 1)
+                               ? total + "<sup>" + sequences + "</sup>"
+                               : total.ToString();
+                }
+                Voxel minVoxel = voxelGrid[x, 0, z];
+                Voxel maxVoxel = voxelGrid[x, size.y - 1, z];
+                minVoxel.SetClue(Axis.Y, clueText);
+                maxVoxel.SetClue(Axis.Y, clueText);
             }
         }
-
-        // ----- Z-axis lines: for each (x,y), scan z = 0..GridSize.z-1 -----
-        for (int x = 0; x < gridData.gridSize.x; x++)
+        // Z-axis lines (vary z, fixed x,y)
+        for (int x = 0; x < size.x; x++)
         {
-            for (int y = 0; y < gridData.gridSize.y; y++)
+            for (int y = 0; y < size.y; y++)
             {
-                List<int> lineClues = CountLine((z) => new Vector3Int(x, y, z), gridData.gridSize.z);
-                clues[$"Z_{x}_{y}"] = lineClues;
+                List<int> runs = CountLine(z => new Vector3Int(x, y, z), size.z);
+                string clueText;
+                if (runs.Count == 1 && runs[0] == 0)
+                {
+                    clueText = "0";
+                }
+                else
+                {
+                    int total = 0;
+                    runs.ForEach(r => total += r);
+                    int sequences = runs.Count;
+                    clueText = (sequences > 1)
+                               ? total + "<sup>" + sequences + "</sup>"
+                               : total.ToString();
+                }
+                Voxel minVoxel = voxelGrid[x, y, 0];
+                Voxel maxVoxel = voxelGrid[x, y, size.z - 1];
+                minVoxel.SetClue(Axis.Z, clueText);
+                maxVoxel.SetClue(Axis.Z, clueText);
             }
         }
-
-        return clues;
     }
 
     // Walks one straight line; counts consecutive filled cells into a list of run-lengths.
@@ -54,7 +100,7 @@ public class NonogramClueGenerator : MonoBehaviour
         for (int i = 0; i < length; i++)
         {
             Vector3Int pos = getPos(i);       // convert line index -> (x,y,z) for this line
-            bool filled = gridData.HasVoxel(pos);
+            bool filled = levelData.Data.GridData.HasVoxel(pos);
 
             if (filled)
             {

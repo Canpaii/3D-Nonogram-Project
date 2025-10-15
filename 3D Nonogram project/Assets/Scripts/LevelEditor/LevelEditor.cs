@@ -152,15 +152,15 @@ public class LevelEditor : MonoBehaviour
     public void AddVoxelToData(Vector3Int pos, Color color)
     {
         var s = new VoxelSaveData(pos, color);
-        data.voxelMap[pos] = s;
+        data.voxelSaveDataMap[pos] = s;
         data.voxels.Add(s);
     }
 
     public void RemoveVoxelFromData(Vector3Int pos)
     {
-        if (data.voxelMap.TryGetValue(pos, out var s))
+        if (data.voxelSaveDataMap.TryGetValue(pos, out var s))
         {
-            data.voxelMap.Remove(pos);
+            data.voxelSaveDataMap.Remove(pos);
             data.voxels.Remove(s);
         }
     }
@@ -176,7 +176,7 @@ public class LevelEditor : MonoBehaviour
                 break;
             }
         }
-        if (data.voxelMap.TryGetValue(pos, out var s)) s.voxelColor = color;
+        if (data.voxelSaveDataMap.TryGetValue(pos, out var s)) s.voxelColor = color;
     }
     public void OnGridSizeCommand(Vector3Int newSize)
     {
@@ -198,7 +198,7 @@ public class LevelEditor : MonoBehaviour
         }
         foreach (var p in toRemove)
         {
-            if (data.voxelMap.TryGetValue(p, out var s)) trimmedOut.Add(new VoxelSaveData(s.gridPosition, s.voxelColor));
+            if (data.voxelSaveDataMap.TryGetValue(p, out var s)) trimmedOut.Add(new VoxelSaveData(s.gridPosition, s.voxelColor));
             RemoveVoxelFromData(p);
 
             foreach (Transform child in _voxelParent)
@@ -236,7 +236,7 @@ public class LevelEditor : MonoBehaviour
         // Remove from data + scene
         foreach (var p in toRemove)
         {
-            if (data.voxelMap.TryGetValue(p, out var sData))
+            if (data.voxelSaveDataMap.TryGetValue(p, out var sData))
             {
                 data.voxels.Remove(sData);
                 data.voxelMap.Remove(p);
@@ -300,10 +300,10 @@ public class LevelEditor : MonoBehaviour
         _boundingBox.LoadGridSize(data.gridSize);
 
         // Rebuild Dictionary for easy look ups
-        data.voxelMap = new Dictionary<Vector3Int, VoxelSaveData>();
+        data.voxelSaveDataMap = new Dictionary<Vector3Int, VoxelSaveData>();
         foreach (VoxelSaveData v in data.voxels)
         {
-            data.voxelMap[v.gridPosition] = v;
+            data.voxelSaveDataMap[v.gridPosition] = v;
 
             GameObject voxelInstance = Instantiate(_voxel, v.gridPosition, Quaternion.identity);
             voxelInstance.transform.SetParent(_voxelParent, true);

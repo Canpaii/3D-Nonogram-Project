@@ -29,7 +29,7 @@ public class ServerList : MonoBehaviour
             string json = request.downloadHandler.text;
             Debug.Log("Received JSON: " + json);
 
-          
+
             string wrappedJson = "{\"levels\":" + json + "}";
             LevelList list = JsonUtility.FromJson<LevelList>(wrappedJson);
 
@@ -39,8 +39,8 @@ public class ServerList : MonoBehaviour
                 buttonInstance.Initialize(level, downloadLvls);
 
                 buttonInstance.transform.SetParent(contenObject, false);
-                
-                buttonInstance.GetComponent<Button>().onClick.AddListener(()=> downloadLvls.StartDownloadCoroutine(level));
+
+                buttonInstance.GetComponent<Button>().onClick.AddListener(() => downloadLvls.StartDownloadCoroutine(level));
 
                 if (buttonInstance.GetComponent<Button>() == null)
                 {
@@ -51,6 +51,7 @@ public class ServerList : MonoBehaviour
         else
         {
             Debug.LogError("Error: " + request.error);
+
         }
     }
 }
