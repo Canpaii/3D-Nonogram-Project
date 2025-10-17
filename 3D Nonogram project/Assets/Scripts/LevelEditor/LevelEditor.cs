@@ -178,10 +178,7 @@ public class LevelEditor : MonoBehaviour
         }
         if (data.voxelSaveDataMap.TryGetValue(pos, out var s)) s.voxelColor = color;
     }
-    public void OnGridSizeCommand(Vector3Int newSize)
-    {
-        _history.Do(new GridSizeCommand(this, data.gridSize,newSize));
-    }
+    
     public void SetGridSize(Vector3Int newSize, out List<VoxelSaveData> trimmedOut)
     {
         data.gridSize = newSize;
@@ -201,49 +198,6 @@ public class LevelEditor : MonoBehaviour
             if (data.voxelSaveDataMap.TryGetValue(p, out var s)) trimmedOut.Add(new VoxelSaveData(s.gridPosition, s.voxelColor));
             RemoveVoxelFromData(p);
 
-            foreach (Transform child in _voxelParent)
-            {
-                var vd = child.GetComponent<VoxelData>();
-                if (vd != null && vd.GridPosition == p)
-                {
-                    Destroy(child.gameObject);
-                    break;
-                }
-            }
-        }
-    }
-
-
-    private void TrimToGrid()
-    {
-        GetCenteredBounds(_boundingBox.GridSize, out var min, out var max);
-
-        // Gather OOB positions first (don’t mutate while iterating)
-        List<Vector3Int> toRemove = new List<Vector3Int>();
-        foreach (var kvp in data.voxelMap)
-        {
-            Vector3Int p = kvp.Key;
-            if (p.x < min.x || p.x > max.x ||
-                p.y < min.y || p.y > max.y ||
-                p.z < min.z || p.z > max.z)
-            {
-                toRemove.Add(p);
-            }
-        }
-
-        if (toRemove.Count == 0) return;
-
-        // Remove from data + scene
-        foreach (var p in toRemove)
-        {
-            if (data.voxelSaveDataMap.TryGetValue(p, out var sData))
-            {
-                data.voxels.Remove(sData);
-                data.voxelMap.Remove(p);
-            }
-
-            // destroy the instance in the scene
-            // (optional optimization: keep a pos->GameObject map)
             foreach (Transform child in _voxelParent)
             {
                 var vd = child.GetComponent<VoxelData>();
@@ -327,7 +281,10 @@ public class LevelEditor : MonoBehaviour
         data.voxelMap.Clear();
     }
 
-   
+    public void OnGridSizeCommand(Vector3Int newSize)
+    {
+        _history.Do(new GridSizeCommand(this, data.gridSize,newSize));
+    }
     public void UndoButton() => _history.Undo();
     public void RedoButton() => _history.Redo();
 
