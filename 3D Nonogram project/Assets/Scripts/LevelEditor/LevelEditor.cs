@@ -184,10 +184,12 @@ public class LevelEditor : MonoBehaviour
         data.gridSize = newSize;
         // collect trimmed before deleting
         GetCenteredBounds(newSize, out var min, out var max);
+        print(min);
+        print(max);
         trimmedOut = new List<VoxelSaveData>();
 
         List<Vector3Int> toRemove = new();
-        foreach (var kv in data.voxelMap)
+        foreach (var kv in data.voxelSaveDataMap)
         {
             var p = kv.Key;
             if (p.x < min.x || p.x > max.x || p.y < min.y || p.y > max.y || p.z < min.z || p.z > max.z)
@@ -210,7 +212,7 @@ public class LevelEditor : MonoBehaviour
         }
     }
 
-    private static void GetCenteredBounds(Vector3Int size, out Vector3Int min, out Vector3Int max)
+    private void GetCenteredBounds(Vector3Int size, out Vector3Int min, out Vector3Int max)
     {
         min = new Vector3Int(
             Mathf.FloorToInt(-(size.x - 1) * 0.5f),
@@ -283,7 +285,7 @@ public class LevelEditor : MonoBehaviour
 
     public void OnGridSizeCommand(Vector3Int newSize)
     {
-        _history.Do(new GridSizeCommand(this, data.gridSize,newSize));
+        _history.Do(new GridSizeCommand(this, _boundingBox,data.gridSize,newSize));
     }
     public void UndoButton() => _history.Undo();
     public void RedoButton() => _history.Redo();

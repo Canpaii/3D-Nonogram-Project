@@ -61,6 +61,16 @@ public class BoundingBox : MonoBehaviour
         AdjustPlaneScales();
         AdjustSlider();
     }
+    public void SetGridSizeAll(Vector3Int newSize)
+    {
+        GridSize = newSize;
+        _textX.text = $"X: {GridSize.x}";
+        _textY.text = $"Y: {GridSize.y}";
+        _textZ.text = $"Z: {GridSize.z}";
+
+        AdjustPlaneScales();
+        AdjustSlider();
+    }
 
     public void SetGridSizeX()
     {
