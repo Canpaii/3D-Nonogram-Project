@@ -30,7 +30,7 @@ public class Voxel : MonoBehaviour
     [Header("Voxel state")]
     private VoxelState state;
     private VoxelState previousState;
-    public bool PuzzleVoxel { get; private set; } // Determines if the voxel is part of the puzzle or filler
+    public bool puzzleVoxel;// Determines if the voxel is part of the puzzle or filler
 
     [Header("Materials and colors")]
     public Color FinalColor { get; private set; }
@@ -50,7 +50,7 @@ public class Voxel : MonoBehaviour
     }
     public void Initialize(bool isPuzzleVoxel, PuzzleManager manager)
     {
-        PuzzleVoxel = isPuzzleVoxel;
+        puzzleVoxel = isPuzzleVoxel;
         puzzleManager = manager;
         _rend = GetComponent<Renderer>();
         _rend.material = baseMaterial;
@@ -79,7 +79,7 @@ public class Voxel : MonoBehaviour
 
     public void SetVoxelType(bool b)
     {
-        PuzzleVoxel = b;
+        puzzleVoxel = b;
     }
 
     public void HandleClick(InteractionType iType)
@@ -102,7 +102,7 @@ public class Voxel : MonoBehaviour
 
     private void TryPaint()
     {
-        if (!PuzzleVoxel)
+        if (!puzzleVoxel)
         {
             puzzleManager.ShowFeedback("Incorrect! That voxel shouldn't be painted.");
             return;
@@ -118,7 +118,7 @@ public class Voxel : MonoBehaviour
 
     private void TryDestroy()
     {
-        if (PuzzleVoxel)
+        if (puzzleVoxel)
         {
             puzzleManager.ShowFeedback("Incorrect! That voxel is part of the puzzle.");
             return;

@@ -2,8 +2,8 @@ using UnityEngine;
 
 public enum InteractionType
 {
-    Mark = 0,
-    Paint = 1,
+    Paint = 0,
+    Mark = 1,
     Destroy = 2,
 }
 public class VoxelInteraction : MonoBehaviour

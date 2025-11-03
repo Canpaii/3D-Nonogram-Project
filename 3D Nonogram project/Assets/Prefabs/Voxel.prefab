@@ -709,9 +709,9 @@ MonoBehaviour:
   minXAxis: {fileID: 7231607977517766572}
   minYAxis: {fileID: 4502878786157372523}
   minZAxis: {fileID: 3235698309052477764}
-  baseMaterial: {fileID: 2100000, guid: 6d17f10e9fc636244acd12b735a344c4, type: 2}
+  baseMaterial: {fileID: 2100000, guid: 5c5122862c390614db6803decb02ba06, type: 2}
   markedMaterial: {fileID: 2100000, guid: 224d4a09a1c21ac4e8696abcc20cefe6, type: 2}
-  colloredMaterial: {fileID: 2100000, guid: d0005f09b17ee1d46bb5f70014d57300, type: 2}
+  paintedMaterial: {fileID: 2100000, guid: d0005f09b17ee1d46bb5f70014d57300, type: 2}
 --- !u!1 &3683432844299436590
 GameObject:
   m_ObjectHideFlags: 0

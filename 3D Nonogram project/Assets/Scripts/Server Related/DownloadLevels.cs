@@ -15,13 +15,14 @@ public class DownloadLevels : MonoBehaviour
     }
     private IEnumerator DownloadLevel(string levelName)
     {
-        string url = $"https://db08756d6d51.ngrok-free.app/download?name={levelName}";
+        string url = $"https://f2d7e2fad01b.ngrok-free.app/download?name={levelName}";
 
         UnityWebRequest request = UnityWebRequest.Get(url);
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
+            print("works");
             // Step 1: Raw JSON string from Flask
             string json = request.downloadHandler.text;
             Debug.Log("Received JSON: " + json);

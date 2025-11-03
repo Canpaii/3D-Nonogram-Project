@@ -20,7 +20,7 @@ public class ServerList : MonoBehaviour
     }
     private IEnumerator ListLevels()
     {
-        string url = "https://db08756d6d51.ngrok-free.app/list";
+        string url = "https://f2d7e2fad01b.ngrok-free.app/list";
         UnityWebRequest request = UnityWebRequest.Get(url);
         yield return request.SendWebRequest();
 

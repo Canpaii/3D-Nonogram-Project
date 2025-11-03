@@ -18,7 +18,7 @@ public class NonogramClueGenerator : MonoBehaviour
                 string clueText;
                 if (runs.Count == 1 && runs[0] == 0)
                 {
-                    clueText = "0";  // no filled blocks in this line
+                    clueText = "";  // no filled blocks in this line
                 }
                 else
                 {
@@ -46,7 +46,7 @@ public class NonogramClueGenerator : MonoBehaviour
                 string clueText;
                 if (runs.Count == 1 && runs[0] == 0)
                 {
-                    clueText = "0";
+                    clueText = "";
                 }
                 else
                 {
@@ -72,7 +72,7 @@ public class NonogramClueGenerator : MonoBehaviour
                 string clueText;
                 if (runs.Count == 1 && runs[0] == 0)
                 {
-                    clueText = "0";
+                    clueText = "";
                 }
                 else
                 {
