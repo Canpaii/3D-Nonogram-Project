@@ -51,8 +51,11 @@ public class LevelEditor : MonoBehaviour
         if (!_hasHit) return;
 
         Vector3 hitPos = _currentHit.point;
-        
-        Vector3Int gridPos = GetGridPosition(hitPos, _currentHit.normal);
+
+        // Dont want to use the offset with painting or erasing
+        bool offset = _editMode == EditMode.Place;
+        Vector3Int gridPos = GetGridPosition(hitPos, _currentHit.normal, offset);
+
         if (gridPos != _lastGridPos)
         {
             HandleHover(gridPos);
@@ -229,12 +232,15 @@ public class LevelEditor : MonoBehaviour
             && p.y >= min.y && p.y <= max.y
             && p.z >= min.z && p.z <= max.z;
     }
-
-    private Vector3Int GetGridPosition(Vector3 hitPoint, Vector3 normal)
+    private Vector3Int GetGridPosition(Vector3 hitPoint, Vector3 normal, bool useOffset)
     {
-        // Move to the voxel space by rounding, then offset in the hit normal direction
-        return Vector3Int.RoundToInt(hitPoint + normal * 0.5f);
+        if (useOffset)
+            return Vector3Int.RoundToInt(hitPoint + normal * 0.5f);
+        else
+            return Vector3Int.RoundToInt(hitPoint);
     }
+
+
 
     public void SaveFile(string fileName)
     { 

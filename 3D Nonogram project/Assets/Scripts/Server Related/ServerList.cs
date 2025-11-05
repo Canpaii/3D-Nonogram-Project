@@ -32,21 +32,29 @@ public class ServerList : MonoBehaviour
 
             string wrappedJson = "{\"levels\":" + json + "}";
             LevelList list = JsonUtility.FromJson<LevelList>(wrappedJson);
-
             foreach (var level in list.levels)
             {
-                LevelButton buttonInstance = Instantiate(button, transform);
-                buttonInstance.Initialize(level, downloadLvls);
+                string levelCopy = level; // fix closure bug
 
+                LevelButton buttonInstance = Instantiate(button, transform);
+                buttonInstance.Initialize(levelCopy, downloadLvls);
                 buttonInstance.transform.SetParent(contenObject, false);
 
-                buttonInstance.GetComponent<Button>().onClick.AddListener(() => downloadLvls.StartDownloadCoroutine(level));
-
-                if (buttonInstance.GetComponent<Button>() == null)
+                Button uiButton = buttonInstance.GetComponentInChildren<Button>();
+                if (uiButton != null)
                 {
-                    print("Error");
+     
+                    uiButton.onClick.AddListener(() =>
+                        downloadLvls.StartDownloadCoroutine(levelCopy));
+
+                    print(uiButton.onClick.GetPersistentEventCount());
+                }
+                else
+                {
+                    Debug.LogWarning("Button component not found on LevelButton.");
                 }
             }
+
         }
         else
         {
