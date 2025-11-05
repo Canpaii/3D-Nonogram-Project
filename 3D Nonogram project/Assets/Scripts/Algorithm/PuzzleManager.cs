@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 public class PuzzleManager : MonoBehaviour
 {
@@ -7,10 +8,13 @@ public class PuzzleManager : MonoBehaviour
     [SerializeField] private GameObject winPanel;
     [SerializeField] private TMP_Text feedbackText;
 
-    private int totalPuzzleVoxels;
-    private int totalFillerVoxels;
-    private int paintedCount;
-    private int destroyedCount;
+    [SerializeField] private int totalPuzzleVoxels;
+    [SerializeField] private int totalFillerVoxels;
+    [SerializeField] private int paintedCount;
+    [SerializeField] private int destroyedCount;
+
+    public List<Voxel> puzzleVoxelList = new List<Voxel>();
+
 
     private float feedbackTimer;
 
@@ -45,6 +49,8 @@ public class PuzzleManager : MonoBehaviour
         {
             if (winPanel != null)
                 winPanel.SetActive(true);
+
+            ChangeColor();
             ShowFeedback("Puzzle Complete!");
         }
     }
@@ -53,7 +59,16 @@ public class PuzzleManager : MonoBehaviour
     {
         if (feedbackText == null) return;
         feedbackText.text = message;
-        feedbackTimer = 3f; // Show for 2 seconds
+        feedbackTimer = 3f; 
+    }
+
+    public void ChangeColor()
+    {
+        foreach (Voxel v in puzzleVoxelList) 
+        { 
+            v.DisplayFinalColor();
+            v.SetCluesToZero();
+        }
     }
 
     private void Update()

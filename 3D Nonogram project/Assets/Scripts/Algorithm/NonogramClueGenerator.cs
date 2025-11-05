@@ -9,32 +9,26 @@ public class NonogramClueGenerator : MonoBehaviour
     public void GenerateAndAssignClues(Voxel[,,] voxelGrid)
     {
         Vector3Int size = levelData.Data.GridData.gridSize;
+        // Calculate center offset for each axis
+        Vector3Int center = new Vector3Int(
+            (size.x - 1) / 2,
+            (size.y - 1) / 2,
+            (size.z - 1) / 2
+        );
+
         // X-axis lines (vary x, fixed y,z)
         for (int y = 0; y < size.y; y++)
         {
             for (int z = 0; z < size.z; z++)
             {
-                List<int> runs = CountLine(x => new Vector3Int(x, y, z), size.x);
-                string clueText;
-                if (runs.Count == 1 && runs[0] == 0)
-                {
-                    clueText = "";  // no filled blocks in this line
-                }
-                else
-                {
-                    int total = 0;
-                    runs.ForEach(r => total += r);
-                    int sequences = runs.Count;
-                    // Format as total with sequences in superscript if multiple sequences
-                    clueText = (sequences > 1)
-                               ? total + "<sup>" + sequences + "</sup>"
-                               : total.ToString();
-                }
-                // Assign clue to the min and max X side voxels of this line:
-                Voxel minVoxel = voxelGrid[0, y, z];
-                Voxel maxVoxel = voxelGrid[size.x - 1, y, z];
-                minVoxel.SetClue(Axis.X, clueText);
-                maxVoxel.SetClue(Axis.X, clueText);
+                // Count filled runs along X, accounting for center offset
+                List<int> runs = CountLine(x =>
+                    new Vector3Int(x - center.x, y - center.y, z - center.z), size.x);
+
+                string clueText = FormatClueText(runs);
+                // Assign clue to both ends of this X-line
+                voxelGrid[0, y, z].SetClue(Axis.X, clueText);
+                voxelGrid[size.x - 1, y, z].SetClue(Axis.X, clueText);
             }
         }
         // Y-axis lines (vary y, fixed x,z)
@@ -42,25 +36,12 @@ public class NonogramClueGenerator : MonoBehaviour
         {
             for (int z = 0; z < size.z; z++)
             {
-                List<int> runs = CountLine(y => new Vector3Int(x, y, z), size.y);
-                string clueText;
-                if (runs.Count == 1 && runs[0] == 0)
-                {
-                    clueText = "";
-                }
-                else
-                {
-                    int total = 0;
-                    runs.ForEach(r => total += r);
-                    int sequences = runs.Count;
-                    clueText = (sequences > 1)
-                               ? total + "<sup>" + sequences + "</sup>"
-                               : total.ToString();
-                }
-                Voxel minVoxel = voxelGrid[x, 0, z];
-                Voxel maxVoxel = voxelGrid[x, size.y - 1, z];
-                minVoxel.SetClue(Axis.Y, clueText);
-                maxVoxel.SetClue(Axis.Y, clueText);
+                List<int> runs = CountLine(y =>
+                    new Vector3Int(x - center.x, y - center.y, z - center.z), size.y);
+
+                string clueText = FormatClueText(runs);
+                voxelGrid[x, 0, z].SetClue(Axis.Y, clueText);
+                voxelGrid[x, size.y - 1, z].SetClue(Axis.Y, clueText);
             }
         }
         // Z-axis lines (vary z, fixed x,y)
@@ -68,28 +49,29 @@ public class NonogramClueGenerator : MonoBehaviour
         {
             for (int y = 0; y < size.y; y++)
             {
-                List<int> runs = CountLine(z => new Vector3Int(x, y, z), size.z);
-                string clueText;
-                if (runs.Count == 1 && runs[0] == 0)
-                {
-                    clueText = "";
-                }
-                else
-                {
-                    int total = 0;
-                    runs.ForEach(r => total += r);
-                    int sequences = runs.Count;
-                    clueText = (sequences > 1)
-                               ? total + "<sup>" + sequences + "</sup>"
-                               : total.ToString();
-                }
-                Voxel minVoxel = voxelGrid[x, y, 0];
-                Voxel maxVoxel = voxelGrid[x, y, size.z - 1];
-                minVoxel.SetClue(Axis.Z, clueText);
-                maxVoxel.SetClue(Axis.Z, clueText);
+                List<int> runs = CountLine(z =>
+                    new Vector3Int(x - center.x, y - center.y, z - center.z), size.z);
+
+                string clueText = FormatClueText(runs);
+                voxelGrid[x, y, 0].SetClue(Axis.Z, clueText);
+                voxelGrid[x, y, size.z - 1].SetClue(Axis.Z, clueText);
             }
         }
     }
+
+    // Helper to format the clue text from runs of filled cells
+    private string FormatClueText(List<int> runs)
+    {
+        if (runs.Count == 1 && runs[0] == 0)
+            return "";  // no filled blocks in this line
+
+        int total = 0;
+        runs.ForEach(r => total += r);
+        int sequences = runs.Count;
+        // Format as "total<sup>sequences</sup>" if multiple sequences, else just total
+        return (sequences > 1) ? $"{total}<sup>{sequences}</sup>" : total.ToString();
+    }
+
 
     // Walks one straight line; counts consecutive filled cells into a list of run-lengths.
     private List<int> CountLine(System.Func<int, Vector3Int> getPos, int length)

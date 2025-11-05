@@ -16,6 +16,9 @@ public class AutoColorCard : MonoBehaviour
     [Header("Button Prefab")]
     public Button buttonPrefab;
 
+    [Header("Level Editor")]
+    public LevelEditor levelEditor;
+
     [Header("Colors")]
     [Range(0f, 1f)] public float alpha = 1f;
 
@@ -149,6 +152,9 @@ public class AutoColorCard : MonoBehaviour
                     btn.name = $"Btn_Gray_V{Mathf.RoundToInt(p * 100f)}";
                     var img = btn.GetComponent<Image>();
                     if (img) img.color = col;
+
+                    Color buttonColor = col; 
+                    btn.onClick.AddListener(() => levelEditor.SetColor(buttonColor)); 
                 }
                 continue;
             }
@@ -190,6 +196,9 @@ public class AutoColorCard : MonoBehaviour
 
                 var img = btn.GetComponent<Image>();
                 if (img) img.color = col;
+
+                Color buttonColor = col;
+                btn.onClick.AddListener(() => levelEditor.SetColor(buttonColor));
             }
 
         }

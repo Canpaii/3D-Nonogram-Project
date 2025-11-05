@@ -709,6 +709,7 @@ MonoBehaviour:
   minXAxis: {fileID: 7231607977517766572}
   minYAxis: {fileID: 4502878786157372523}
   minZAxis: {fileID: 3235698309052477764}
+  puzzleVoxel: 0
   baseMaterial: {fileID: 2100000, guid: 5c5122862c390614db6803decb02ba06, type: 2}
   markedMaterial: {fileID: 2100000, guid: 224d4a09a1c21ac4e8696abcc20cefe6, type: 2}
   paintedMaterial: {fileID: 2100000, guid: d0005f09b17ee1d46bb5f70014d57300, type: 2}
@@ -1530,14 +1531,14 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8691775586863566350}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0.501}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6786491839360407909}
   m_Father: {fileID: 1384830356410006527}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
