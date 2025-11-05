@@ -5,15 +5,15 @@ public class NonogramClueGenerator : MonoBehaviour
 {
     public LevelDataSO levelData;
 
-    // Returns all clues, keyed by which axis/line they belong to.
     public void GenerateAndAssignClues(Voxel[,,] voxelGrid)
     {
         Vector3Int size = levelData.Data.GridData.gridSize;
-        // Calculate center offset for each axis
-        Vector3Int center = new Vector3Int(
-            (size.x - 1) / 2,
-            (size.y - 1) / 2,
-            (size.z - 1) / 2
+
+        // Match offset used in LevelCreation
+        Vector3Int min = new Vector3Int(
+            Mathf.FloorToInt(-(size.x - 1) * 0.5f),
+            Mathf.FloorToInt(-(size.y - 1) * 0.5f),
+            Mathf.FloorToInt(-(size.z - 1) * 0.5f)
         );
 
         // X-axis lines (vary x, fixed y,z)
@@ -21,40 +21,46 @@ public class NonogramClueGenerator : MonoBehaviour
         {
             for (int z = 0; z < size.z; z++)
             {
-                // Count filled runs along X, accounting for center offset
                 List<int> runs = CountLine(x =>
-                    new Vector3Int(x - center.x, y - center.y, z - center.z), size.x);
-
+                    new Vector3Int(x + min.x, y + min.y, z + min.z), size.x);
                 string clueText = FormatClueText(runs);
-                // Assign clue to both ends of this X-line
-                voxelGrid[0, y, z].SetClue(Axis.X, clueText);
-                voxelGrid[size.x - 1, y, z].SetClue(Axis.X, clueText);
+
+                for (int x = 0; x < size.x; x++)
+                {
+                    voxelGrid[x, y, z].SetClue(Axis.X, clueText);
+                }
             }
         }
+
         // Y-axis lines (vary y, fixed x,z)
         for (int x = 0; x < size.x; x++)
         {
             for (int z = 0; z < size.z; z++)
             {
                 List<int> runs = CountLine(y =>
-                    new Vector3Int(x - center.x, y - center.y, z - center.z), size.y);
-
+                    new Vector3Int(x + min.x, y + min.y, z + min.z), size.y);
                 string clueText = FormatClueText(runs);
-                voxelGrid[x, 0, z].SetClue(Axis.Y, clueText);
-                voxelGrid[x, size.y - 1, z].SetClue(Axis.Y, clueText);
+
+                for (int y = 0; y < size.y; y++)
+                {
+                    voxelGrid[x, y, z].SetClue(Axis.Y, clueText);
+                }
             }
         }
+
         // Z-axis lines (vary z, fixed x,y)
         for (int x = 0; x < size.x; x++)
         {
             for (int y = 0; y < size.y; y++)
             {
                 List<int> runs = CountLine(z =>
-                    new Vector3Int(x - center.x, y - center.y, z - center.z), size.z);
-
+                    new Vector3Int(x + min.x, y + min.y, z + min.z), size.z);
                 string clueText = FormatClueText(runs);
-                voxelGrid[x, y, 0].SetClue(Axis.Z, clueText);
-                voxelGrid[x, y, size.z - 1].SetClue(Axis.Z, clueText);
+
+                for (int z = 0; z < size.z; z++)
+                {
+                    voxelGrid[x, y, z].SetClue(Axis.Z, clueText);
+                }
             }
         }
     }
